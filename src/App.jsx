@@ -6,6 +6,7 @@ import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import ProductsPage from './pages/ProductsPage';
 import OrdersPage from './pages/OrdersPage';
+import ReviewsPage from './pages/ReviewsPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route path="/products" element={<ProductsPage />} />
+              <Route path="/reviews" element={<ReviewsPage />} />
             </Route>
           </Routes>
         </div>

@@ -17,9 +17,14 @@ const Navbar = () => {
                 Orders
               </Link>
               {user.role === 'admin' && (
+                <>
                 <Link to="/products" className="px-3 py-2 text-gray-600 hover:text-gray-900">
                   Products
                 </Link>
+                <Link to="/reviews" className="px-3 py-2 text-gray-600 hover:text-gray-900">
+                  Reviews
+                </Link>
+                </>
               )}
             </>
           )}

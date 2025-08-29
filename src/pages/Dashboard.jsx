@@ -22,6 +22,8 @@ const Dashboard = () => {
         </div>
         
         {user?.role === 'admin' && (
+          <>
+          
           <div className="bg-green-50 p-4 rounded-lg">
             <h2 className="text-xl font-semibold mb-2">Product Management</h2>
             <p>Manage fish products and options.</p>
@@ -34,6 +36,19 @@ const Dashboard = () => {
               </Link>
             </div>
           </div>
+          <div className="bg-red-50 p-4 rounded-lg">
+            <h2 className="text-xl font-semibold mb-2">Reviews</h2>
+            <p>Read Customer Reviews.</p>
+            <div className="mt-4">
+              <Link 
+                to="/reviews" 
+                className="text-red-600 hover:text-red-800 font-medium"
+              >
+                Go to Reviews →
+              </Link>
+            </div>
+          </div>
+          </>
         )}
       </div>
     </div>
