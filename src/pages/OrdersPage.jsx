@@ -34,9 +34,7 @@ const OrdersPage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Fish Orders Management</h1>
-      
-      <div className="bg-white p-4 rounded-lg shadow-md">
+       <div className="bg-white p-4 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4">Order List</h2>
         <OrderList 
           orders={orders} 

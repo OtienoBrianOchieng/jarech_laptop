@@ -7,8 +7,14 @@ const Reviews = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
 
-  const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString();
-  const formatTime = (dateStr) => new Date(dateStr).toLocaleTimeString();
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
 
   // Fetch reviews
   const fetchReviews = useCallback(async () => {
@@ -35,24 +41,29 @@ const Reviews = () => {
   }, []);
 
   // Update review status
-  const updateReviewStatus = useCallback(async (reviewId) => {
+  const updateReviewStatus = useCallback(async (reviewId, newStatus) => {
     try {
       await fetch(`http://127.0.0.1:5000/reviews/${reviewId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
       });
       setReviews((prev) =>
-        prev.map((r) => (r.id === reviewId ? { ...r, status: "read" } : r))
+        prev.map((r) => (r.id === reviewId ? { ...r, status: newStatus } : r))
       );
+      // Also update selected review if it's the one being modified
+      if (selectedReview && selectedReview.id === reviewId) {
+        setSelectedReview({...selectedReview, status: newStatus});
+      }
     } catch {
       setError("Failed to update review status.");
     }
-  }, []);
+  }, [selectedReview]);
 
   // Open review
   const handleReviewClick = (review) => {
     setSelectedReview(review);
-    if (review.status === "unread") updateReviewStatus(review.id);
+    if (review.status === "unread") updateReviewStatus(review.id, "read");
   };
 
   const handleCloseReview = () => setSelectedReview(null);
@@ -74,7 +85,7 @@ const Reviews = () => {
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500" />
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500" />
       </div>
     );
   }
@@ -88,7 +99,7 @@ const Reviews = () => {
           <p className="text-sm text-gray-500 mt-2">{error}</p>
           <button
             onClick={fetchReviews}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="mt-4 bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700"
           >
             Try Again
           </button>
@@ -99,94 +110,121 @@ const Reviews = () => {
 
   // --- Main Layout ---
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 p-4">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+      <div className="bg-white shadow-sm rounded-lg p-4 mb-4 flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <h1 className="text-xl font-bold text-gray-800">Customer Reviews</h1>
+          <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">
             {unreadCount} unread
           </span>
-          <button
-            onClick={fetchReviews}
-            className="bg-white border px-3 py-2 rounded-lg text-sm hover:bg-gray-50"
-          >
-            Refresh
-          </button>
         </div>
-      </header>
+        <button
+          onClick={fetchReviews}
+          className="bg-white border border-gray-300 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 flex items-center"
+        >
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh
+        </button>
+      </div>
 
       {/* Tabs */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex bg-white border rounded-lg overflow-hidden mb-6">
-          {["all", "unread", "read"].map((tab) => (
+      <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+        <div className="flex border-b">
+          {[
+            { id: "all", label: "All", count: reviews.length },
+            { id: "unread", label: "Unread", count: unreadCount },
+            { id: "read", label: "Read", count: readCount }
+          ].map((tab) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                activeTab === tab
-                  ? "bg-blue-100 text-blue-800"
-                  : "hover:bg-gray-100 text-gray-600"
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
+                activeTab === tab.id
+                  ? "border-orange-500 text-orange-700"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)} (
-              {tab === "all" ? reviews.length : tab === "unread" ? unreadCount : readCount})
+              {tab.label} ({tab.count})
             </button>
           ))}
         </div>
+      </div>
 
-        {/* Reviews */}
-        <div className="space-y-4">
-          {filteredReviews.length === 0 ? (
-            <div className="bg-white p-8 text-center rounded-lg border">
-              <h3 className="text-lg font-medium text-gray-900">
-                No {activeTab} reviews
-              </h3>
-              {activeTab !== "all" && (
-                <button
-                  onClick={() => setActiveTab("all")}
-                  className="mt-4 text-blue-600 hover:text-blue-500 text-sm"
-                >
-                  View all reviews
-                </button>
-              )}
-            </div>
-          ) : (
-            filteredReviews.map((review) => (
-              <div
-                key={review.id}
-                className={`bg-white rounded-lg border p-6 cursor-pointer hover:shadow-md ${
-                  selectedReview?.id === review.id ? "ring-2 ring-blue-500" : ""
-                } ${
-                  review.status === "unread" ? "border-l-4 border-blue-500" : ""
-                }`}
-                onClick={() => handleReviewClick(review)}
+      {/* Reviews Table */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        {filteredReviews.length === 0 ? (
+          <div className="p-8 text-center">
+            <h3 className="text-lg font-medium text-gray-900">
+              No {activeTab} reviews
+            </h3>
+            {activeTab !== "all" && (
+              <button
+                onClick={() => setActiveTab("all")}
+                className="mt-4 text-orange-600 hover:text-orange-500 text-sm"
               >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-2">
-                    <span className="bg-gray-100 px-2 py-1 rounded text-sm font-medium">
-                      Order #{review.order_id}
-                    </span>
-                    <div className="flex text-yellow-400 text-sm">
-                      {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
-                    </div>
-                  </div>
-                  {review.status === "unread" && (
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                      New
-                    </span>
-                  )}
-                </div>
-                <p className="mt-3 text-gray-700 line-clamp-2">
-                  {review.status}
-                </p>
-                <div className="mt-2 text-xs text-gray-500 flex justify-between">
-                  <span>{formatDate(review.created_at)}</span>
-                  <span>{formatTime(review.created_at)}</span>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+                View all reviews
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Rating
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredReviews.map((review) => (
+                  <tr 
+                    key={review.id} 
+                    className={`hover:bg-gray-50 ${review.status === "unread" ? "bg-blue-50" : ""}`}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{formatDate(review.created_at)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex text-yellow-400">
+                        {"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        review.status === "unread" 
+                          ? "bg-orange-100 text-orange-800" 
+                          : "bg-green-100 text-green-800"
+                      }`}>
+                        {review.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <button
+                        onClick={() => handleReviewClick(review)}
+                        className="text-orange-600 hover:text-orange-900"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Review Detail Modal */}
@@ -194,7 +232,7 @@ const Reviews = () => {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
         >
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
             {/* Header */}
@@ -204,62 +242,83 @@ const Reviews = () => {
               </h2>
               <button
                 onClick={handleCloseReview}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 text-2xl"
               >
-                ✕
+                &times;
               </button>
             </div>
 
             {/* Content */}
             <div className="p-6 space-y-6">
               {/* Order Info */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">
-                  Order Information
-                </h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-700">
-                      Order ID:
-                    </span>{" "}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">
+                    Order ID
+                  </h3>
+                  <p className="text-sm font-medium text-gray-900">
                     #{selectedReview.order_id}
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">
-                      Client Phone:
-                    </span>{" "}
-                    {selectedReview.client_phone || "N/A"}
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Date:</span>{" "}
-                    {formatDate(selectedReview.created_at)}
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Time:</span>{" "}
-                    {formatTime(selectedReview.created_at)}
-                  </div>
+                  </p>
                 </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">
+                    Date & Time
+                  </h3>
+                  <p className="text-sm text-gray-900">
+                    {formatDate(selectedReview.created_at)} •{" "}
+                    {new Date(selectedReview.created_at).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </p>
+                </div>
+                {selectedReview.client_phone && (
+                  <div className="md:col-span-2">
+                    <h3 className="text-sm font-medium text-gray-500 mb-1">
+                      Client Phone
+                    </h3>
+                    <p className="text-sm text-gray-900">
+                      {selectedReview.client_phone}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Rating & Status */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">
-                  Rating & Status
-                </h3>
-                <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">
+                    Rating
+                  </h3>
                   <div className="flex text-yellow-400 text-lg">
                     {"★".repeat(selectedReview.rating)}
                     {"☆".repeat(5 - selectedReview.rating)}
+                    <span className="ml-2 text-gray-700 text-base">({selectedReview.rating}/5)</span>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">
+                    Status
+                  </h3>
+                  <div className="flex items-center space-x-2">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       selectedReview.status === "unread"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {selectedReview.status}
-                  </span>
+                        ? "bg-orange-100 text-orange-800"
+                        : "bg-green-100 text-green-800"
+                    }`}>
+                      {selectedReview.status}
+                    </span>
+                    <button
+                      onClick={() => updateReviewStatus(
+                        selectedReview.id, 
+                        selectedReview.status === "unread" ? "read" : "unread"
+                      )}
+                      className="text-xs text-gray-500 hover:text-gray-700 underline"
+                    >
+                      Mark as {selectedReview.status === "unread" ? "read" : "unread"}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -268,17 +327,30 @@ const Reviews = () => {
                 <h3 className="text-sm font-medium text-gray-500 mb-2">
                   Review Text
                 </h3>
-                <div className="bg-gray-50 p-4 rounded-lg text-gray-700 leading-relaxed">
-                  {selectedReview.review_text}
+                <div className="bg-gray-50 p-4 rounded-lg text-gray-700">
+                  {selectedReview.review_text || "No review text provided."}
                 </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t bg-gray-50">
+            <div className="px-6 py-4 border-t bg-gray-50 flex justify-between">
+              <button
+                onClick={() => updateReviewStatus(
+                  selectedReview.id, 
+                  selectedReview.status === "unread" ? "read" : "unread"
+                )}
+                className={`px-4 py-2 rounded-md text-sm ${
+                  selectedReview.status === "unread"
+                    ? "bg-green-100 text-green-800 hover:bg-green-200"
+                    : "bg-orange-100 text-orange-800 hover:bg-orange-200"
+                }`}
+              >
+                Mark as {selectedReview.status === "unread" ? "Read" : "Unread"}
+              </button>
               <button
                 onClick={handleCloseReview}
-                className="w-full bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
               >
                 Close
               </button>

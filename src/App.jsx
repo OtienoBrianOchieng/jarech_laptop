@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import ProductsPage from './pages/ProductsPage';
 import OrdersPage from './pages/OrdersPage';
 import ReviewsPage from './pages/ReviewsPage';
+import RidersPage from './pages/RidersPage';
 
 function App() {
   return (
@@ -20,11 +21,13 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/orders" element={<OrdersPage />} />
+              <Route path = "/riders" element = {<RidersPage />} />
             </Route>
             
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/reviews" element={<ReviewsPage />} />
+              
             </Route>
           </Routes>
         </div>

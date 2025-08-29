@@ -6,7 +6,7 @@ const ProductList = ({ products, onEdit, onDelete }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024); // adjust breakpoint if needed
+      setIsDesktop(window.innerWidth >= 1024);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -32,45 +32,49 @@ const ProductList = ({ products, onEdit, onDelete }) => {
 
   /** Desktop View */
   const desktopView = (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+    <div className="overflow-x-auto rounded-xl shadow-lg">
+      <table className="min-w-full bg-white border-separate border-spacing-0">
         <thead>
-          <tr className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wide">
-            <th className="py-3 px-4 border-b text-left">Name</th>
-            <th className="py-3 px-4 border-b text-left">Description</th>
-            <th className="py-3 px-4 border-b text-left">Heat Level</th>
-            <th className="py-3 px-4 border-b text-left">Options</th>
-            <th className="py-3 px-4 border-b text-center">Actions</th>
+          <tr className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-sm uppercase tracking-wide">
+            <th className="py-4 px-6 text-left first:rounded-tl-xl">Name</th>
+            <th className="py-4 px-6 text-left">Description</th>
+            <th className="py-4 px-6 text-left">Heat Level</th>
+            <th className="py-4 px-6 text-left">Options</th>
+            <th className="py-4 px-6 text-center last:rounded-tr-xl">Actions</th>
           </tr>
         </thead>
-        <tbody className="text-sm text-gray-800">
-          {products.map((product) => (
+        <tbody className="text-sm text-gray-700">
+          {products.map((product, index) => (
             <tr
               key={product.id}
-              className="hover:bg-gray-50 transition-colors duration-200"
+              className={`transition-colors duration-150 ${index % 2 === 0 ? 'bg-orange-50' : 'bg-white'} hover:bg-orange-100`}
             >
-              <td className="py-3 px-4 border-b">{product.name}</td>
-              <td className="py-3 px-4 border-b">{product.description}</td>
-              <td className="py-3 px-4 border-b">{product.heat_level}</td>
-              <td className="py-3 px-4 border-b">
+              <td className="py-3 px-6 border-b border-orange-200 font-medium text-orange-900">{product.name}</td>
+              <td className="py-3 px-6 border-b border-orange-200 max-w-xs truncate">{product.description}</td>
+              <td className="py-3 px-6 border-b border-orange-200">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                  {product.heat_level}
+                </span>
+              </td>
+              <td className="py-3 px-6 border-b border-orange-200">
                 {product.options &&
                   Object.entries(product.options).map(([key, value]) => (
-                    <div key={key} className="text-gray-600">
-                      <span className="font-medium">{key}:</span>{" "}
+                    <div key={key} className="text-gray-600 text-xs">
+                      <span className="font-medium text-orange-700">{key}:</span>{" "}
                       {renderOptionValue(value)}
                     </div>
                   ))}
               </td>
-              <td className="py-3 px-4 border-b text-center space-x-2">
+              <td className="py-3 px-6 border-b border-orange-200 text-center space-x-2">
                 <button
                   onClick={() => onEdit(product)}
-                  className="bg-blue-500 text-white px-4 py-1.5 rounded-lg hover:bg-blue-600 transition-colors duration-200"
+                  className="bg-green-500 text-white px-4 py-1.5 rounded-lg hover:bg-green-600 transition-colors duration-200 shadow-sm hover:shadow-md"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(product.id)}
-                  className="bg-red-500 text-white px-4 py-1.5 rounded-lg hover:bg-red-600 transition-colors duration-200"
+                  className="bg-orange-600 text-white px-4 py-1.5 rounded-lg hover:bg-orange-700 transition-colors duration-200 shadow-sm hover:shadow-md"
                 >
                   Delete
                 </button>
@@ -88,24 +92,26 @@ const ProductList = ({ products, onEdit, onDelete }) => {
       {products.map((product) => (
         <div
           key={product.id}
-          className="border border-gray-200 rounded-xl shadow-sm p-4 bg-white space-y-3"
+          className="border border-orange-200 rounded-xl shadow-sm p-5 bg-white space-y-3 transition-all duration-150 hover:shadow-md"
         >
           <div>
-            <p className="text-gray-900 font-semibold text-lg">{product.name}</p>
-            <p className="text-gray-600 text-sm">{product.description}</p>
+            <p className="text-orange-900 font-bold text-lg">{product.name}</p>
+            <p className="text-gray-600 text-sm mt-1">{product.description}</p>
           </div>
-          <p className="text-sm">
-            <strong className="text-gray-700">Heat Level:</strong>{" "}
-            {product.heat_level}
-          </p>
+          <div className="flex items-center">
+            <strong className="text-gray-700 text-sm mr-2">Heat Level:</strong>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+              {product.heat_level}
+            </span>
+          </div>
           {product.options && (
             <div>
-              <strong className="text-gray-700">Options:</strong>
-              <ul className="list-disc pl-5 text-sm text-gray-600">
+              <strong className="text-gray-700 text-sm">Options:</strong>
+              <ul className="mt-1 space-y-1 text-sm text-gray-600">
                 {Object.entries(product.options).map(([key, value]) => (
-                  <li key={key}>
-                    <span className="font-medium">{key}:</span>{" "}
-                    {renderOptionValue(value)}
+                  <li key={key} className="flex">
+                    <span className="font-medium text-orange-700 mr-1">{key}:</span>
+                    <span className="truncate">{renderOptionValue(value)}</span>
                   </li>
                 ))}
               </ul>
@@ -114,13 +120,13 @@ const ProductList = ({ products, onEdit, onDelete }) => {
           <div className="flex flex-col sm:flex-row gap-2 pt-2">
             <button
               onClick={() => onEdit(product)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200 w-full sm:w-auto"
+              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-200 shadow-sm hover:shadow-md flex-1 sm:flex-none"
             >
               Edit
             </button>
             <button
               onClick={() => handleDelete(product.id)}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 w-full sm:w-auto"
+              className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors duration-200 shadow-sm hover:shadow-md flex-1 sm:flex-none"
             >
               Delete
             </button>
@@ -131,7 +137,7 @@ const ProductList = ({ products, onEdit, onDelete }) => {
   );
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6 bg-gradient-to-br from-orange-50 to-green-50 min-h-screen">
       {isDesktop ? desktopView : mobileView}
     </div>
   );
