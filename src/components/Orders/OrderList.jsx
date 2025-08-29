@@ -61,7 +61,7 @@ const OrderList = ({ orders, onStatusUpdate, onDeliveryUpdate }) => {
       <div className="max-w-md mx-auto">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex font-bold items-center pointer-events-none">
-              Search
+              {/* Search */}
           </div>
           <input
             type="text"
@@ -112,9 +112,11 @@ const OrderList = ({ orders, onStatusUpdate, onDeliveryUpdate }) => {
               "Mpesa Reference",
               "Payment Status",
               "Phone",
+              "Deliver To",
               "Status",
               "Notes",
               "Actions",
+              
             ].map((heading) => (
               <th
                 key={heading}
@@ -146,8 +148,9 @@ const OrderList = ({ orders, onStatusUpdate, onDeliveryUpdate }) => {
                 ) : (
                   <td> - </td>
                 )}
-                {order.payment_method === 'M-PESA' ? (<div className="text-xs text-black mb-1">{order.payment_status}</div>) : (<div className="text-xs bg-orange-500 text-black mb-1">On delivery</div>) }
+                {order.payment_method === 'M-PESA' ? (<div className="text-black mb-1">{order.payment_status}</div>) : (<div className="text p-2 bg-orange-300 text-black mb-1">On delivery</div>) }
                 <td className="py-3 px-4 text-sm">{order.customer_phone}</td>
+                <td className="py-3 px-4 text-sm">{order.delivery_address}</td>
                 <td className="py-3 px-4">
                   <select
                     value={order.status}
@@ -167,7 +170,7 @@ const OrderList = ({ orders, onStatusUpdate, onDeliveryUpdate }) => {
                   {editingDelivery === order.id ? (
                     <div className="space-y-2">
                       <textarea
-                        placeholder="Delivery Address"
+                        placeholder="Add notes"
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
                         className="w-full p-2 border rounded text-sm"
@@ -219,6 +222,7 @@ const OrderList = ({ orders, onStatusUpdate, onDeliveryUpdate }) => {
               </td>
             </tr>
           )}
+          
         </tbody>
       </table>
     </div>
@@ -293,6 +297,10 @@ const OrderList = ({ orders, onStatusUpdate, onDeliveryUpdate }) => {
                     <div className="text-xs text-black mb-1">Phone : {order.customer_phone}</div>
 
                   </div>
+                  <div>
+                    <div className="text-xs text-black mb-1"> Deliver To: {order.delivery_address}</div>
+
+                  </div>
                 </div>
 
                 {/* Status */}
@@ -321,7 +329,7 @@ const OrderList = ({ orders, onStatusUpdate, onDeliveryUpdate }) => {
                   {editingDelivery === order.id ? (
                     <div className="space-y-2">
                       <textarea
-                        placeholder="Delivery Address"
+                        placeholder="Add notes"
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
                         className="w-full p-2 border rounded text-sm"
@@ -357,7 +365,7 @@ const OrderList = ({ orders, onStatusUpdate, onDeliveryUpdate }) => {
                         onClick={() => handleDeliveryEdit(order)}
                         className="mt-2 bg-green-500 text-white px-3 py-2 rounded text-sm w-full"
                       >
-                        Update Delivery Info
+                        Comment about this order
                       </button>
                     </div>
                   )}
