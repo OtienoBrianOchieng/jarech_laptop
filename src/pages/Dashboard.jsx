@@ -170,7 +170,7 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        { (user?.role === 'admin' || user?.role === 'admin') && (<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-orange-500">
             <div className="flex justify-between items-start">
               <div>
@@ -232,7 +232,7 @@ const Dashboard = () => {
             </div>
             <p className="text-xs text-green-600 mt-2">{stats.reviews.average_rating} avg rating</p>
           </div>
-        </div>
+        </div>)}
 
         {/* Orders by Month Bar Chart */}
         {ordersByMonth.length > 0 && (
@@ -265,9 +265,12 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-orange-900 mb-4">Quick Actions</h2>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link 
+           { (user?.role === 'admin' || user?.role === 'admin') && (
+          <>
+          <h2 className="text-xl font-bold text-orange-900 mb-4">Quick Actions</h2>
+           <Link 
               to="/orders" 
               className="bg-white rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-200 border border-orange-200 hover:border-orange-300 group"
             >
@@ -287,7 +290,7 @@ const Dashboard = () => {
                 </svg>
               </div>
             </Link>
-                            <Link 
+            <Link 
                   to="/riders" 
                   className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 shadow-md hover:shadow-lg transition-all duration-300 border border-blue-200 hover:border-blue-400 group transform hover:-translate-y-1"
                 >
@@ -307,6 +310,7 @@ const Dashboard = () => {
                     </svg>
                   </div>
                 </Link>
+              </>)}
 
             {user?.role === 'admin' && (
               <>
@@ -350,17 +354,15 @@ const Dashboard = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </div>
-                </Link>
-
-
-                
+                </Link>              
               </>
             )}
           </div>
         </div>
 
         {/* Recent Activity Section */}
-        <div className="bg-white rounded-xl shadow-md p-6">
+        { (user?.role === 'admin' || user?.role === 'admin') && (
+          <div className="bg-white rounded-xl shadow-md p-6">
           <h2 className="text-xl font-bold text-orange-900 mb-4">Recent Activity</h2>
           <div className="space-y-4">
             {stats.recent_activity.length > 0 ? (
@@ -384,7 +386,7 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-        </div>
+        </div>)}
       </div>
     </div>
   );

@@ -39,3 +39,14 @@ export const getCurrentUser = async () => {
   if (!response.ok) throw new Error('Not authenticated');
   return response.json();
 };
+
+// Add rider login function to auth.js
+export const riderLogin = async (credentials) => {
+  const response = await fetch('/api/riders/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+  if (!response.ok) throw new Error('Rider login failed');
+  return response.json();
+};

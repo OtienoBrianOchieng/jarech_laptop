@@ -24,8 +24,9 @@ const Navbar = () => {
             </Link>
             
             {user && (
+            
               <div className="hidden md:flex items-center space-x-6">
-                <Link 
+              {(user.role === 'admin' || user.role === 'seller') &&<Link 
                   to="/orders" 
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     isActive('/orders') 
@@ -39,23 +40,39 @@ const Navbar = () => {
                     </svg>
                     <span>Orders</span>
                   </div>
-                </Link>
+                </Link>}
+              {(user.role === 'rider' || user.role === 'admin') &&<Link 
+                  to="/deliveries" 
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    isActive('/deliveries') 
+                      ? 'bg-white text-orange-700 shadow-lg' 
+                      : 'text-orange-100 hover:bg-orange-500 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span>Deliveries</span>
+                  </div>
+                </Link>}
 
-<Link 
-  to="/riders" 
-  className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-    isActive('/riders') 
-      ? 'bg-white text-orange-700 shadow-lg' 
-      : 'text-orange-100 hover:bg-orange-500 hover:text-white'
-  }`}
->
-  <div className="flex items-center space-x-1">
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-    </svg>
-    <span>Riders</span>
-  </div>
-</Link>
+              {user.role !== 'rider' && 
+              <Link 
+                to="/riders" 
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  isActive('/riders') 
+                    ? 'bg-white text-orange-700 shadow-lg' 
+                    : 'text-orange-100 hover:bg-orange-500 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center space-x-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  <span>Riders</span>
+                </div>
+              </Link>}
                 
                 {user.role === 'admin' && (
                   <>
