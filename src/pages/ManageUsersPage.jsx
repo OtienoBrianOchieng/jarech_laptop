@@ -11,7 +11,8 @@ const ManageUsersPage = () => {
     password: '',
     role: 'seller' // 'admin' or 'seller'
   });
-  const { currentUser } = useAuth();
+  
+  const { user: currentUser } = useAuth();
 
   useEffect(() => {
     fetchUsers();
@@ -20,9 +21,9 @@ const ManageUsersPage = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://127.0.0.1:5000/api/users', {
+      const response = await fetch('/api/users', {
         headers: {
-          'Authorization': currentUser.token
+          'Authorization': localStorage.getItem("token")
         }
       });
       
@@ -45,12 +46,11 @@ const ManageUsersPage = () => {
     setError('');
     
     try {
-      // Use the register endpoint instead of /api/users
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': currentUser.token
+          'Authorization': localStorage.getItem("token")
         },
         body: JSON.stringify(newUser)
       });
@@ -69,7 +69,6 @@ const ManageUsersPage = () => {
         role: 'seller'
       });
       
-      // Show success message
       setError('User created successfully!');
       setTimeout(() => setError(''), 3000);
     } catch (err) {
@@ -86,7 +85,7 @@ const ManageUsersPage = () => {
       const response = await fetch(`/api/users/${userId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': currentUser.token
+          'Authorization': localStorage.getItem("token")
         }
       });
       
@@ -97,7 +96,6 @@ const ManageUsersPage = () => {
       
       setUsers(users.filter(user => user.id !== userId));
       
-      // Show success message
       setError('User deleted successfully!');
       setTimeout(() => setError(''), 3000);
     } catch (err) {
@@ -255,10 +253,16 @@ const ManageUsersPage = () => {
                         <button
                           onClick={() => handleDeleteUser(user.id)}
                           className="text-red-600 hover:text-red-900"
-                          disabled={user.id === currentUser.id}
-                          title={user.id === currentUser.id ? "Cannot delete your own account" : "Delete user"}
+                          disabled={user.role === "admin" || user.id === currentUser?.id}
+                          title={
+                            user.role === "admin" 
+                              ? "Cannot delete admin users" 
+                              : user.id === currentUser?.id 
+                                ? "Cannot delete your own account" 
+                                : "Delete user"
+                          }
                         >
-                          {user.id === currentUser.id ? (
+                          {user.role === "admin" || user.id === currentUser?.id ? (
                             <span className="text-gray-400 cursor-not-allowed">Delete</span>
                           ) : (
                             "Delete"

@@ -11,7 +11,7 @@ const AuthForm = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, sellerLogin } = useAuth();
+  const { login, riderLogin } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +30,7 @@ const AuthForm = () => {
           await login({ email: userData.email, password: userData.password });
           break;
         case 'sellerLogin':
-          await sellerLogin({ 
+          await riderLogin({ 
             phonenumber: userData.phonenumber, 
             accessCode: userData.accessCode 
           });
