@@ -146,7 +146,7 @@ const Dashboard = () => {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-orange-900">
+              <h1 className="text-2xl md:text-2xl font-bold text-orange-900">
                 Welcome back, {user?.name}!
               </h1>
               <p className="text-green-700 mt-2">
@@ -234,35 +234,54 @@ const Dashboard = () => {
           </div>
         </div>)}
 
-        {/* Orders by Month Bar Chart */}
-        {ordersByMonth.length > 0 && (
-          <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold text-orange-900 mb-4">Orders by Month</h2>
-            <div className="flex items-end justify-between h-64 mt-6">
-              {ordersByMonth.map((monthData, index) => (
-                <div key={index} className="flex flex-col items-center flex-1 mx-1">
-                  <div className="relative flex flex-col items-center group">
-                    <div 
-                      className="w-8 bg-orange-400 hover:bg-orange-500 transition-all duration-200 rounded-t"
-                      style={{ 
-                        height: `${maxOrders ? (monthData.count / maxOrders) * 90 : 0}%`,
-                        minHeight: monthData.count > 0 ? '4px' : '0'
-                      }}
-                    ></div>
-                    <div className="mt-2 text-xs text-gray-500">{monthData.month}</div>
-                    <div className="absolute top-0 flex-col items-center hidden mb-6 group-hover:flex">
-                      <div className="relative z-10 p-2 text-xs leading-none text-white bg-gray-800 rounded shadow-lg">
-                        {monthData.count} orders
-                      </div>
-                      <div className="w-3 h-3 -mt-2 rotate-45 bg-gray-800"></div>
-                    </div>
-                  </div>
+{ordersByMonth.length > 0 && (
+  <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+    <h2 className="text-xl font-bold text-orange-900 mb-4">Orders by Month</h2>
+    
+    {/* Mobile scroll container */}
+    <div className="relative">
+      {/* Scrollable container for mobile */}
+      <div className="overflow-x-auto pb-4 -mx-2 px-2 md:overflow-visible md:mx-0 md:px-0">
+        <div className="flex min-w-min md:flex-wrap md:justify-between md:items-end h-64 mt-6 space-x-2 md:space-x-0">
+          {ordersByMonth.map((monthData, index) => (
+            <div 
+              key={index} 
+              className="flex flex-col items-center flex-shrink-0 w-12 md:flex-1 md:mx-1"
+            >
+              <div className="relative flex flex-col items-center group w-full">
+                <div 
+                  className="w-8 bg-orange-400 hover:bg-orange-500 transition-all duration-200 rounded-t"
+                  style={{ 
+                    height: `${maxOrders ? (monthData.count / maxOrders) * 90 : 0}%`,
+                    minHeight: monthData.count > 0 ? '4px' : '0'
+                  }}
+                ></div>
+                <div className="mt-2 text-xs text-gray-500 text-center whitespace-nowrap">
+                  {monthData.month}
                 </div>
-              ))}
+                <div className="absolute top-0 flex-col items-center hidden mb-6 group-hover:flex">
+                  <div className="relative z-10 p-2 text-xs leading-none text-white bg-gray-800 rounded shadow-lg">
+                    {monthData.count} orders
+                  </div>
+                  <div className="w-3 h-3 -mt-2 rotate-45 bg-gray-800"></div>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-
+          ))}
+        </div>
+      </div>
+      
+      {/* Mobile scroll indicators */}
+      <div className="md:hidden absolute top-1/2 transform -translate-y-1/2 left-0 w-4 h-8 bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
+      <div className="md:hidden absolute top-1/2 transform -translate-y-1/2 right-0 w-4 h-8 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+    </div>
+    
+    {/* Mobile instructions */}
+    <p className="md:hidden text-xs text-gray-500 text-center mt-3">
+      ← Scroll sideways to view all months →
+    </p>
+  </div>
+)}
         {/* Quick Actions */}
         <div className="mb-8">
 

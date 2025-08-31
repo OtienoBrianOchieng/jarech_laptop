@@ -9,6 +9,7 @@ import OrdersPage from './pages/OrdersPage';
 import ReviewsPage from './pages/ReviewsPage';
 import RidersPage from './pages/RidersPage';
 import RiderDeliveryPage from './pages/RiderDeliveryPage';
+import ManageUsersPage from './pages/ManageUsersPage';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/reviews" element={<ReviewsPage />} />
+              <Route path = "/users" element = {<ManageUsersPage />} />
               
             </Route>
           </Routes>

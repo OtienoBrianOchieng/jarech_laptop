@@ -194,7 +194,7 @@ const RiderList = () => {
                         
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-lg font-semibold text-orange-900">{rider.fullname}</h3>
+                            <h3 className="text-lg font-semibold text-orange-900">{rider.name}</h3>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                               rider.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-800'
                             }`}>
@@ -210,19 +210,19 @@ const RiderList = () => {
                               <span>{rider.phonenumber}</span>
                             </div>
                             
-                            {isAdmin && 
+                            
                             <div className="flex items-center">
                               <svg className="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                               </svg>
-                              <span>{rider.bike_number_plate}</span>
-                            </div>}
-                            <div className="flex items-center">
+                              <span>Bike: {rider.bike_number_plate}</span>
+                            </div>
+                           {isAdmin &&  <div className="flex items-center">
                               <svg className="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                               </svg>
                               <span>{rider.access_code}</span>
-                            </div>
+                            </div>}
                             
                           </div>
 
@@ -250,7 +250,7 @@ const RiderList = () => {
                     {isAdmin && (
                       <div className="flex flex-col sm:flex-row gap-2">
                         <button
-                          onClick={() => toggleActive(rider.id, rider.is_active, rider.fullname)}
+                          onClick={() => toggleActive(rider.id, rider.is_active, rider.name)}
                           className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center ${
                             rider.is_active 
                               ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' 
@@ -268,7 +268,7 @@ const RiderList = () => {
                         </button>
                         
                         <button
-                          onClick={() => deleteRider(rider.id, rider.fullname)}
+                          onClick={() => deleteRider(rider.id, rider.name)}
                           className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center justify-center"
                         >
                           <svg className="w-4 h-4 mr-2" fill="none" stroke="current极" viewBox="0 0 24 24">
