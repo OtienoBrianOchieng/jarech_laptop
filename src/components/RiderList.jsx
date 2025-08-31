@@ -127,7 +127,7 @@ const RiderList = () => {
               <div>
                 <p className="text-xs极 text-gray-500">Active Riders</p>
                 <p className="text-2xl font-bold text-green-800">
-                  {riders.filter(rider => rider.is_active).length}
+                  {Array.isArray(riders) && riders.filter(rider => rider.is_active).length}
                 </p>
               </div>
               <div className="bg-green-100 p-2 rounded-full">
@@ -143,7 +143,7 @@ const RiderList = () => {
               <div>
                 <p className="text text-gray-500">Total Assigned Orders</p>
                 <p className="text-2xl font-bold text-orange-800">
-                  {riders.reduce((total, rider) => total + rider.orders.length, 0)}
+                  {Array.isArray(riders) && riders.reduce((total, rider) => total + rider.orders.length, 0)}
                 </p>
               </div>
               <div className="bg-orange-100 p-2 rounded-full">
@@ -180,7 +180,7 @@ const RiderList = () => {
             </div>
           ) : (
             <div className="divide-y divide-orange-100">
-              {riders.map((rider) => (
+              {Array.isArray(riders) && riders.map((rider) => (
                 <div key={rider.id} className="p-6 hover:bg-orange-50 transition-colors">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     {/* Rider Info */}
