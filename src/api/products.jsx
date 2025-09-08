@@ -41,3 +41,24 @@ export const deleteProduct = async (id) => {
   if (!response.ok) throw new Error('Failed to delete product');
   return response.json();
 };
+
+export const updateProductCount = async (id, quantity) => {
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/api/products/${id}/restock`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ quantity }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update product count');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating product count:', error);
+    throw error;
+  }
+};

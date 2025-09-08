@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { deleteProduct } from "../../api/products";
+import { deleteProduct, updateProductCount } from "../../api/products";
 
-const ProductList = ({ products, onEdit, onDelete }) => {
+const ProductList = ({ products, onEdit, onDelete, onRestock }) => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [restockQuantities, setRestockQuantities] = useState({});
+  const [isRestocking, setIsRestocking] = useState({});
 
   useEffect(() => {
     const handleResize = () => {
@@ -24,6 +26,40 @@ const ProductList = ({ products, onEdit, onDelete }) => {
     }
   };
 
+  const handleRestockChange = (id, value) => {
+    setRestockQuantities({
+      ...restockQuantities,
+      [id]: parseInt(value) || 0
+    });
+  };
+
+  const submitRestock = async (id) => {
+    const quantity = restockQuantities[id] || 0;
+    
+    if (quantity <= 0) {
+      alert("Please enter a valid quantity greater than 0");
+      return;
+    }
+
+    setIsRestocking({ ...isRestocking, [id]: true });
+    
+    try {
+      const updatedProduct = await updateProductCount(id, quantity);
+      onRestock(updatedProduct);
+      
+      // Clear the input field
+      setRestockQuantities({
+        ...restockQuantities,
+        [id]: 0
+      });
+    } catch (error) {
+      console.error("Restock failed:", error);
+      alert("Failed to restock product");
+    } finally {
+      setIsRestocking({ ...isRestocking, [id]: false });
+    }
+  };
+
   const renderOptionValue = (value) => {
     if (value === null || value === undefined) return "—";
     if (typeof value === "object") return JSON.stringify(value);
@@ -39,6 +75,8 @@ const ProductList = ({ products, onEdit, onDelete }) => {
             <th className="py-4 px-6 text-left first:rounded-tl-xl">Name</th>
             <th className="py-4 px-6 text-left">Description</th>
             <th className="py-4 px-6 text-left">Heat Level</th>
+            <th className="py-4 px-6 text-left">Count</th>
+            <th className="py-4 px-6 text-left">Restock</th>
             <th className="py-4 px-6 text-left">Options</th>
             <th className="py-4 px-6 text-center last:rounded-tr-xl">Actions</th>
           </tr>
@@ -55,6 +93,26 @@ const ProductList = ({ products, onEdit, onDelete }) => {
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                   {product.heat_level}
                 </span>
+              </td>
+              <td className="py-3 px-6 border-b border-orange-200 font-medium text-orange-900">{product.count}</td>
+              <td className="py-3 px-6 border-b border-orange-200">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    min="1"
+                    value={restockQuantities[product.id] || ""}
+                    onChange={(e) => handleRestockChange(product.id, e.target.value)}
+                    className="w-16 px-2 py-1 border border-orange-300 rounded-md text-sm"
+                    placeholder="Qty"
+                  />
+                  <button
+                    onClick={() => submitRestock(product.id)}
+                    disabled={isRestocking[product.id]}
+                    className="bg-blue-500 text-white px-2 py-1 rounded-md text-xs hover:bg-blue-600 transition-colors duration-200 disabled:bg-blue-300"
+                  >
+                    {isRestocking[product.id] ? "..." : "Add"}
+                  </button>
+                </div>
               </td>
               <td className="py-3 px-6 border-b border-orange-200">
                 {product.options &&
@@ -103,6 +161,28 @@ const ProductList = ({ products, onEdit, onDelete }) => {
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
               {product.heat_level}
             </span>
+          </div>
+          <div className="flex items-center">
+            <strong className="text-gray-700 text-sm mr-2">Count:</strong>
+            <span className="font-medium text-orange-900">{product.count}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <strong className="text-gray-700 text-sm">Restock:</strong>
+            <input
+              type="number"
+              min="1"
+              value={restockQuantities[product.id] || ""}
+              onChange={(e) => handleRestockChange(product.id, e.target.value)}
+              className="w-16 px-2 py-1 border border-orange-300 rounded-md text-sm"
+              placeholder="Qty"
+            />
+            <button
+              onClick={() => submitRestock(product.id)}
+              disabled={isRestocking[product.id]}
+              className="bg-blue-500 text-white px-2 py-1 rounded-md text-xs hover:bg-blue-600 transition-colors duration-200 disabled:bg-blue-300"
+            >
+              {isRestocking[product.id] ? "..." : "Add"}
+            </button>
           </div>
           {product.options && (
             <div>
